@@ -32,13 +32,13 @@ public class AdminUI extends JFrame {
     private JPanel boardManagementPanel;
     private TabButton currentSelectedTabButton = null;
 
-    // Pagination fields
+
     private int currentPage = 0;
-    private final int boardsPerPage = 10; // Changed to 10 boards per page
+    private final int boardsPerPage = 10; 
     private JButton prevPageButton;
     private JButton nextPageButton;
 
-    // User Management Panel
+
     private JPanel userManagementPanel;
 
 
@@ -98,12 +98,12 @@ public class AdminUI extends JFrame {
         logoutBtn.addActionListener(e -> performLogout());
         headerPanel.add(logoutBtn);
 
-        JButton userManagementBtn = new JButton("유저 관리"); // Changed from settingsBtn to userManagementBtn
+        JButton userManagementBtn = new JButton("유저 관리");
         userManagementBtn.addActionListener(e -> {
             if (currentSelectedTabButton != null) {
-                currentSelectedTabButton.setSelectedTab(false); // Deselect any board tab
+                currentSelectedTabButton.setSelectedTab(false); 
             }
-            centerCardLayout.show(centerCardPanel, "UserManagement"); // Show User Management Panel
+            centerCardLayout.show(centerCardPanel, "UserManagement"); 
         });
         headerPanel.add(userManagementBtn);
 
@@ -117,7 +117,7 @@ public class AdminUI extends JFrame {
 
         JPanel mainPanel = new JPanel(new MigLayout("fill, insets 20 20 20 20", "[grow]", "[60!][][grow]"));
 
-        // Modified menuBar layout to accommodate pagination controls
+
         menuBar = new JPanel(new MigLayout("fillx", "[left][grow, center][right]", "[60!]"));
 
         addBoardBtn = new JButton("게시판 추가");
@@ -167,7 +167,7 @@ public class AdminUI extends JFrame {
                     boolean success = BorderDAO.addBoard(boardName, isAnonymous);
                     if (success) {
                         JOptionPane.showMessageDialog(this, "'" + boardName + "' 게시판이 성공적으로 추가되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
-                        currentPage = 0; // Reset to the first page after adding a new board
+                        currentPage = 0; 
                         refreshBoardPanels();
                     } else {
                         JOptionPane.showMessageDialog(this, "게시판 추가에 실패했습니다. (DB 오류 또는 중복 이름)", "오류", JOptionPane.ERROR_MESSAGE);
@@ -180,7 +180,7 @@ public class AdminUI extends JFrame {
         });
         menuBar.add(addBoardBtn, "cell 0 0, align left");
 
-        // Panel for pagination controls (prev, tabs, next)
+
         JPanel paginationControlsPanel = new JPanel(new MigLayout("insets 0", "[]5[]5[]", "[]"));
         paginationControlsPanel.setOpaque(false);
 
@@ -195,7 +195,7 @@ public class AdminUI extends JFrame {
         });
         paginationControlsPanel.add(prevPageButton);
 
-        boardManagementPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0)); // Existing panel for tabs
+        boardManagementPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0)); 
         boardManagementPanel.setOpaque(false);
         paginationControlsPanel.add(boardManagementPanel);
 
@@ -213,10 +213,10 @@ public class AdminUI extends JFrame {
 
         menuBar.add(paginationControlsPanel, "cell 1 0, growx, pushx, align center");
 
-        // Initial call to refresh board panels and display tabs
+
         refreshBoardPanels();
 
-        // Initialize User Management Panel
+
         userManagementPanel = new JPanel(new MigLayout("fill"));
         userManagementPanel.add(new JLabel("<html><center>여기에 사용자 목록 및 정지 기능이 표시됩니다.<br>추후 구현 예정.</center></html>", SwingConstants.CENTER), "grow, push");
         centerCardPanel.add(userManagementPanel, "UserManagement"); // Add User Management Panel to CardLayout
@@ -237,21 +237,11 @@ public class AdminUI extends JFrame {
     }
 
     private void refreshBoardPanels() {
-        boardManagementPanel.removeAll(); // Clear only the board tabs on the current page
-        // Only clear PostPanels that are not currently displayed (e.g., if we were on UserManagementPanel)
-        // For simplicity, we clear all and recreate.
-        // A more robust solution might track the currently visible card.
-        // However, for board tabs, it's safer to clear and re-add all, as boardList might have changed.
-
-        // Before clearing postPanelMap, ensure "UserManagement" card is not selected to avoid trying to remove it.
-        // This is handled by showing "no_boards" or the first board if available.
-
-        // We clear postPanelMap and centerCardPanel elements related to boards.
-        // The userManagementPanel is added once and stays.
+        boardManagementPanel.removeAll(); 
         postPanelMap.clear();
         Component[] components = centerCardPanel.getComponents();
         for (Component comp : components) {
-            // Keep the UserManagementPanel if it's there
+
             if (comp != userManagementPanel) {
                 centerCardPanel.remove(comp);
             }
@@ -259,11 +249,9 @@ public class AdminUI extends JFrame {
 
 
         try {
-            boardList = BorderDAO.findAll(); // Re-fetch all boards from the database
+            boardList = BorderDAO.findAll(); 
 
             if (boardList != null && !boardList.isEmpty()) {
-                // First, ensure all PostPanels are created and added to centerCardPanel
-                // This ensures CardLayout can switch to any board's panel regardless of current pagination
                 for (Border border : boardList) {
                     int borderId = border.getId();
                     PostPanel postPanel = new PostPanel(adminUser, borderId);
@@ -273,8 +261,7 @@ public class AdminUI extends JFrame {
 
                 int totalPages = (int) Math.ceil((double) boardList.size() / boardsPerPage);
 
-                // Adjust currentPage if it's out of bounds after a board deletion, etc.
-                if (currentPage >= totalPages && totalPages > 0) {
+                 if (currentPage >= totalPages && totalPages > 0) {
                     currentPage = totalPages - 1;
                 } else if (totalPages == 0) {
                     currentPage = 0;
@@ -285,9 +272,8 @@ public class AdminUI extends JFrame {
 
                 List<Border> boardsForCurrentPage = boardList.subList(startIndex, endIndex);
 
-                TabButton firstButtonOnPage = null; // To keep track of the first tab added to the current page
+                TabButton firstButtonOnPage = null; 
 
-                // Populate boardManagementPanel with TabButtons for the current page
                 for (Border border : boardsForCurrentPage) {
                     int borderId = border.getId();
                     String borderName = border.getName();
@@ -300,7 +286,7 @@ public class AdminUI extends JFrame {
                     boardTabBtn.setFont(new Font("맑은 고딕", Font.BOLD, 12));
 
                     if (firstButtonOnPage == null) {
-                        firstButtonOnPage = boardTabBtn; // Assign the first tab on the current page
+                        firstButtonOnPage = boardTabBtn;  
                     }
 
                     JButton deleteBoardBtn = new JButton("X");
@@ -351,14 +337,14 @@ public class AdminUI extends JFrame {
                     boardManagementPanel.add(boardButtonContainer);
                 }
 
-                // Update pagination button states
+
                 prevPageButton.setEnabled(currentPage > 0);
                 nextPageButton.setEnabled(currentPage < totalPages - 1);
 
-                // Auto-select a tab if none is selected or the selected one is no longer visible on the current page
+
                 if (!boardsForCurrentPage.isEmpty()) {
                     boolean foundSelected = false;
-                    // Check if the previously selected tab is among the currently displayed tabs
+
                     if (currentSelectedTabButton != null) {
                         for (Border b : boardsForCurrentPage) {
                             if (currentSelectedTabButton.getText().equals(b.getName())) {
@@ -369,9 +355,7 @@ public class AdminUI extends JFrame {
                             }
                         }
                     }
-                    // If no tab was previously selected, or the previously selected tab is not on the current page,
-                    // select the first one on the current page.
-                    if (!foundSelected && firstButtonOnPage != null) {
+                     if (!foundSelected && firstButtonOnPage != null) {
                         if (currentSelectedTabButton != null) {
                             currentSelectedTabButton.setSelectedTab(false); // Deselect the old one if it existed
                         }
@@ -380,7 +364,7 @@ public class AdminUI extends JFrame {
                         centerCardLayout.show(centerCardPanel, String.valueOf(boardsForCurrentPage.get(0).getId()));
                     }
                 } else {
-                    // If no boards on the current page (e.g., last board on the last page was deleted)
+                   
                     if (currentSelectedTabButton != null) {
                         currentSelectedTabButton.setSelectedTab(false);
                         currentSelectedTabButton = null;
@@ -390,16 +374,15 @@ public class AdminUI extends JFrame {
                 }
 
 
-            } else { // If there are no boards at all
+            } else { 
                 currentSelectedTabButton = null;
                 centerCardPanel.add(new JLabel("<html><center>관리할 게시판이 없습니다.<br>새 게시판을 추가하세요!</center></html>", SwingConstants.CENTER), "no_boards");
                 centerCardLayout.show(centerCardPanel, "no_boards");
-                // Disable pagination buttons if no boards
                 prevPageButton.setEnabled(false);
                 nextPageButton.setEnabled(false);
             }
 
-            // Revalidate and repaint all affected panels
+            
             menuBar.revalidate();
             menuBar.repaint();
             boardManagementPanel.revalidate();
@@ -413,7 +396,6 @@ public class AdminUI extends JFrame {
             JOptionPane.showMessageDialog(this, "게시판 새로고침 중 오류가 발생했습니다.", "오류", JOptionPane.ERROR_MESSAGE);
             centerCardPanel.add(new JLabel("<html><center>게시판을 불러오는 데 실패했습니다.<br>잠시 후 다시 시도해주세요.</center></html>", SwingConstants.CENTER), "error_board_load");
             centerCardLayout.show(centerCardPanel, "error_board_load");
-            // Disable pagination buttons on error
             prevPageButton.setEnabled(false);
             nextPageButton.setEnabled(false);
 
